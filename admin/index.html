@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - شركة الفيصل للتجارة العامة</title>
+  
+  <!-- Favicon SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c9a84c'/><text y='.9em' font-size='70' x='50' text-anchor='middle' fill='%231a1a2e' font-family='serif'>ف</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-light: #f4f6f9;
+      --bg-card: #ffffff;
+      --primary: #1a1a2e;
+      --primary-hover: #131322;
+      --accent: #c9a84c;
+      --accent-hover: #b0913f;
+      --text: #2d3748;
+      --text-muted: #718096;
+      --border: #e2e8f0;
+      --success: #48bb78;
+      --danger: #e53e3e;
+      --transition: all 0.25s ease;
+      --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-light);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--text-muted);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    .flex-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* --- LOGIN PANEL --- */
+    .login-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, #0d0d1a 100%);
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 70px;
+      height: 70px;
+      background: var(--accent);
+      color: var(--primary);
+      font-size: 2.2rem;
+      font-weight: 800;
+      border-radius: 18px;
+      margin: 0 auto 20px;
+    }
+
+    .login-card h2 {
+      font-size: 1.6rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .login-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: right;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: var(--transition);
+      background-color: var(--bg-light);
+    }
+
+    .input-field:focus {
+      border-color: var(--accent);
+      background-color: var(--bg-card);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .login-error {
+      background-color: rgba(229, 62, 62, 0.1);
+      color: var(--danger);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      text-align: right;
+    }
+
+    .demo-info {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .demo-info code {
+      background: var(--bg-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: var(--danger);
+    }
+
+    .btn-settings-trigger {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 15px;
+      text-decoration: underline;
+    }
+
+    /* --- DASHBOARD LAYOUT --- */
+    #dashboard-layout {
+      display: none; /* Shown after auth */
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    @media (min-width: 992px) {
+      #dashboard-layout {
+        flex-direction: row;
+      }
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      background-color: var(--primary);
+      color: white;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (min-width: 992px) {
+      .sidebar {
+        width: 260px;
+        min-height: 100vh;
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        border-bottom: none;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-brand-logo {
+      width: 38px;
+      height: 38px;
+      background: var(--accent);
+      color: var(--primary);
+      border-radius: 8px;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .sidebar-brand-name h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .sidebar-brand-name p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media (min-width: 992px) {
+      .sidebar-menu {
+        flex-direction: column;
+      }
+    }
+
+    .menu-item button {
+      width: 100%;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: right;
+      transition: var(--transition);
+    }
+
+    .menu-item button:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .menu-item.active button {
+      background-color: var(--accent);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .sidebar-status-card {
+      margin-top: auto;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      display: none;
+    }
+
+    @media (min-width: 992px) {
+      .sidebar-status-card {
+        display: block;
+      }
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      margin-inline-end: 6px;
+    }
+
+    .status-indicator.demo {
+      background: #ed8936;
+    }
+
+    /* Main Section */
+    .main-content {
+      flex-grow: 1;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 992px) {
+      .main-content {
+        margin-inline-end: 260px; /* Offset for fixed sidebar */
+        padding: 40px;
+      }
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .main-header h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .btn-logout {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--danger);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .btn-logout:hover {
+      background: rgba(229, 62, 62, 0.08);
+      border-color: var(--danger);
+    }
+
+    /* Dashboard Panels */
+    .dashboard-panel {
+      display: none;
+    }
+
+    .dashboard-panel.active {
+      display: block;
+    }
+
+    /* CRUD Grid layout */
+    .crud-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    @media (min-width: 992px) {
+      .crud-grid {
+        grid-template-columns: 1.2fr 2fr;
+      }
+    }
+
+    /* Admin Cards */
+    .admin-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .admin-card h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+
+    th {
+      background-color: var(--bg-light);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 16px;
+      font-size: 0.95rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:hover td {
+      background-color: #fafbfc;
+    }
+
+    .thumbnail {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: var(--bg-light);
+    }
+
+    .badge-stock {
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-stock.in {
+      background-color: rgba(72, 187, 120, 0.15);
+      color: var(--success);
+    }
+
+    .badge-stock.out {
+      background-color: rgba(229, 62, 62, 0.15);
+      color: var(--danger);
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-edit, .btn-delete {
+      background: none;
+      border: 1px solid var(--border);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: var(--transition);
+    }
+
+    .btn-edit {
+      color: var(--accent);
+    }
+
+    .btn-edit:hover {
+      background-color: var(--accent);
+      color: var(--primary);
+      border-color: var(--accent);
+    }
+
+    .btn-delete {
+      color: var(--danger);
+    }
+
+    .btn-delete:hover {
+      background-color: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+
+    /* Translation inputs styling */
+    .input-translate-wrapper {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .btn-translate {
+      background-color: var(--accent);
+      color: var(--primary);
+      border: none;
+      padding: 0 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-translate:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-translate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Image Upload Preview */
+    .image-preview-container {
+      width: 100%;
+      height: 150px;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      background: var(--bg-light);
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .image-preview-container:hover {
+      border-color: var(--accent);
+    }
+
+    .image-preview-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-preview-placeholder {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .image-preview-placeholder i {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    /* Form actions buttons */
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .btn-cancel {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+
+    .btn-cancel:hover {
+      background: var(--border);
+    }
+
+    /* Switch Style Checkbox */
+    .switch-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch-input {
+      display: none;
+    }
+
+    .switch-label {
+      width: 44px;
+      height: 24px;
+      background-color: var(--border);
+      border-radius: 20px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .switch-label::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: white;
+      top: 3px;
+      right: 3px;
+      transition: var(--transition);
+    }
+
+    .switch-input:checked + .switch-label {
+      background-color: var(--success);
+    }
+
+    .switch-input:checked + .switch-label::after {
+      transform: translateX(-20px);
+    }
+
+    /* Settings Dialog Overlay */
+    .settings-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 13, 26, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .settings-modal {
+      background: var(--bg-card);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 450px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- --- 1. LOGIN PANEL --- -->
+  <div class="login-wrapper" id="login-panel">
+    <div class="login-card">
+      <div class="login-logo flex-center">ف</div>
+      <h2>شركة الفيصل للتجارة</h2>
+      <p>تسجيل الدخول للوحة التحكم الإدارية</p>
+      
+      <div class="login-error" id="login-error-msg">البريد الإلكتروني أو كلمة المرور غير صحيحة.</div>
+      
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email">البريد الإلكتروني</label>
+          <input type="email" id="login-email" class="input-field" placeholder="email@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">كلمة المرور</label>
+          <input type="password" id="login-password" class="input-field" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit">تسجيل الدخول</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- --- 2. DASHBOARD LAYOUT --- -->
+  <div id="dashboard-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo flex-center">ف</div>
+        <div class="sidebar-brand-name">
+          <h2>شركة الفيصل</h2>
+          <p>لوحة التحكم الإدارية</p>
+        </div>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li class="menu-item active" id="tab-products-btn">
+          <button onclick="switchTab('products')">
+            <i class="fa-solid fa-box-open"></i>
+            <span>إدارة المنتجات</span>
+          </button>
+        </li>
+        <li class="menu-item" id="tab-categories-btn">
+          <button onclick="switchTab('categories')">
+            <i class="fa-solid fa-list"></i>
+            <span>إدارة الأقسام</span>
+          </button>
+        </li>
+        <li class="menu-item" id="tab-agencies-btn">
+          <button onclick="switchTab('agencies')">
+            <i class="fa-solid fa-boxes-packing"></i>
+            <span>إدارة الوكالات</span>
+          </button>
+        </li>
+
+      </ul>
+      
+      <div class="sidebar-status-card" id="db-status-card">
+        <div id="db-status-badge">
+          <span class="status-indicator"></span>
+          متصل بـ Supabase
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Section -->
+    <main class="main-content">
+      <header class="main-header">
+        <h2 id="current-tab-title">إدارة المنتجات</h2>
+        <button class="btn-logout" onclick="handleLogout()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>تسجيل الخروج</span>
+        </button>
+      </header>
+
+      <!-- Panel: Products -->
+      <section class="dashboard-panel active" id="panel-products">
+        <div class="crud-grid">
+          <!-- Add/Edit Form -->
+          <div class="admin-card">
+            <h3 id="product-form-title">إضافة منتج جديد</h3>
+            <form id="product-form" onsubmit="saveProduct(event)">
+              <input type="hidden" id="prod-id">
+              
+              <div class="form-group">
+                <label for="prod-name-ar">اسم المنتج بالعربية</label>
+                <div class="input-translate-wrapper">
+                  <input type="text" id="prod-name-ar" class="input-field" placeholder="مثال: مناديل جونيّا" required>
+                  <button type="button" class="btn-translate" onclick="translateField('prod-name-ar', 'prod-name-en', this)">ترجمة ←</button>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="prod-name-en">الاسم بالإنجليزية</label>
+                <input type="text" id="prod-name-en" class="input-field" placeholder="Example: Junya Tissues" required>
+              </div>
+
+              <div class="form-group">
+                <label for="prod-desc-ar">الوصف بالعربية</label>
+                <div class="input-translate-wrapper">
+                  <textarea id="prod-desc-ar" class="input-field" style="resize: vertical; height: 80px;" placeholder="وصف تفصيلي للمنتج بالعربية..."></textarea>
+                  <button type="button" class="btn-translate" onclick="translateField('prod-desc-ar', 'prod-desc-en', this)">ترجمة ←</button>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="prod-desc-en">الوصف بالإنجليزية</label>
+                <textarea id="prod-desc-en" class="input-field" style="resize: vertical; height: 80px;" placeholder="Detailed English description..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="prod-price">السعر (بالدينار العراقي)</label>
+                <input type="number" id="prod-price" class="input-field" placeholder="مثال: 5000" min="0" required>
+              </div>
+
+              <div class="form-group">
+                <label for="prod-category">القسم</label>
+                <select id="prod-category" class="input-field" required>
+                  <!-- Dynamically populated categories -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>صورة المنتج</label>
+                <input type="file" id="prod-image-file" accept="image/*" style="display: none;" onchange="previewProductImage(event)">
+                <div class="image-preview-container" onclick="document.getElementById('prod-image-file').click()">
+                  <img id="prod-img-preview" src="" alt="Preview" style="display: none;">
+                  <div class="image-preview-placeholder" id="prod-img-placeholder">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>اضغط لاختيار صورة المنتج</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>حالة توفر المنتج في المخزون</label>
+                <label class="switch-container">
+                  <input type="checkbox" id="prod-stock" class="switch-input" checked>
+                  <span class="switch-label"></span>
+                  <span id="prod-stock-text" style="font-weight: 700; font-size: 0.9rem;">متوفر في المخزن ✓</span>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-submit" id="btn-save-product">حفظ المنتج</button>
+                <button type="button" class="btn-cancel" onclick="resetProductForm()">إلغاء</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Product Table List -->
+          <div class="admin-card" style="overflow: hidden;">
+            <h3>قائمة المنتجات</h3>
+            <div class="table-container">
+              <table id="products-table">
+                <thead>
+                  <tr>
+                    <th>صورة</th>
+                    <th>الاسم (عربي)</th>
+                    <th>القسم</th>
+                    <th>السعر</th>
+                    <th>المخزون</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body">
+                  <!-- Dynamically loaded products -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Categories -->
+      <section class="dashboard-panel" id="panel-categories">
+        <div class="crud-grid">
+          <!-- Add/Edit Form -->
+          <div class="admin-card">
+            <h3 id="category-form-title">إضافة قسم جديد</h3>
+            <form id="category-form" onsubmit="saveCategory(event)">
+              <input type="hidden" id="cat-id">
+              
+              <div class="form-group">
+                <label for="cat-name-ar">اسم القسم بالعربية</label>
+                <div class="input-translate-wrapper">
+                  <input type="text" id="cat-name-ar" class="input-field" placeholder="مثال: ورقيات" required>
+                  <button type="button" class="btn-translate" onclick="translateField('cat-name-ar', 'cat-name-en', this)">ترجمة ←</button>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="cat-name-en">الاسم بالإنجليزية</label>
+                <input type="text" id="cat-name-en" class="input-field" placeholder="Example: Papers" required>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-submit" id="btn-save-category">حفظ القسم</button>
+                <button type="button" class="btn-cancel" onclick="resetCategoryForm()">إلغاء</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Category Table List -->
+          <div class="admin-card" style="overflow: hidden;">
+            <h3>قائمة الأقسام</h3>
+            <div class="table-container">
+              <table id="categories-table">
+                <thead>
+                  <tr>
+                    <th>اسم القسم (عربي)</th>
+                    <th>اسم القسم (إنكليزي)</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-table-body">
+                  <!-- Dynamically loaded categories -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Agencies -->
+      <section class="dashboard-panel" id="panel-agencies">
+        <div class="crud-grid">
+          <!-- Add/Edit Form -->
+          <div class="admin-card">
+            <h3 id="agency-form-title">إضافة وكالة جديدة</h3>
+            <form id="agency-form" onsubmit="saveAgency(event)">
+              <input type="hidden" id="ag-id">
+              
+              <div class="form-group">
+                <label for="ag-name">اسم الوكالة</label>
+                <input type="text" id="ag-name" class="input-field" placeholder="مثال: Junya Tissues" required>
+              </div>
+
+              <div class="form-group">
+                <label for="ag-desc-ar">الوصف بالعربية</label>
+                <div class="input-translate-wrapper">
+                  <textarea id="ag-desc-ar" class="input-field" style="resize: vertical; height: 80px;" placeholder="وصف للوكالة..."></textarea>
+                  <button type="button" class="btn-translate" onclick="translateField('ag-desc-ar', 'ag-desc-en', this)">ترجمة ←</button>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="ag-desc-en">الوصف بالإنجليزية</label>
+                <textarea id="ag-desc-en" class="input-field" style="resize: vertical; height: 80px;" placeholder="English description..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>شعار الوكالة (رابط صورة)</label>
+                <input type="text" id="ag-logo" class="input-field" placeholder="https://example.com/logo.png">
+              </div>
+
+              <div class="form-group">
+                <label class="switch-container">
+                  <input type="checkbox" id="ag-exclusive" class="switch-input" checked>
+                  <span class="switch-label"></span>
+                  <span style="font-weight: 700; font-size: 0.9rem;">وكيل حصري</span>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-submit" id="btn-save-agency">حفظ الوكالة</button>
+                <button type="button" class="btn-cancel" onclick="resetAgencyForm()">إلغاء</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Agency Table List -->
+          <div class="admin-card" style="overflow: hidden;">
+            <h3>قائمة الوكالات</h3>
+            <div class="table-container">
+              <table id="agencies-table">
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>حصرية؟</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="agencies-table-body">
+                  <!-- Dynamically loaded agencies -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Supabase Settings Modal Dialog -->
+  <div class="settings-modal-overlay" id="settings-modal">
+    <div class="settings-modal">
+      <h3 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">إعدادات Supabase</h3>
+      <div class="form-group">
+        <label for="set-url">Supabase Project URL</label>
+        <input type="text" id="set-url" class="input-field" placeholder="https://xxxx.supabase.co">
+      </div>
+      <div class="form-group">
+        <label for="set-key">Supabase Anon Key</label>
+        <input type="password" id="set-key" class="input-field" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+      </div>
+      <div class="form-actions">
+        <button class="btn-submit" onclick="saveSettings()">حفظ وإعادة تحميل</button>
+        <button class="btn-cancel" onclick="closeSettingsModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------------------------------
+    // CONSTANTS & MOCK DATA
+    // ----------------------------------------------------
+    const MOCK_CATEGORIES = [];
+    const MOCK_PRODUCTS = [];
+    const MOCK_AGENCIES = [];
+
+    // Force clear old mock data in localStorage to start completely fresh
+    localStorage.removeItem('mock_categories');
+    localStorage.removeItem('mock_products');
+    localStorage.removeItem('mock_agencies');
+
+    // ----------------------------------------------------
+    // APP STATE
+    // ----------------------------------------------------
+    let isMockMode = true;
+    let categoriesList = [];
+    let productsList = [];
+    let agenciesList = [];
+    let uploadedProductImageBase64 = ""; // For mock image storage
+    let selectedImageFile = null; // For live Supabase upload
+
+    // Supabase Credentials
+    let SUPABASE_URL = "https://xlbacprcodgexrtigrvl.supabase.co";
+    let SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsYmFjcHJjb2RnZXhydGlncnZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MTgyNDgsImV4cCI6MjA5NjI5NDI0OH0.rmQWfx9MFEvhAha46rPNTNQrczvTz6mOabZHT17nG70";
+
+    if (localStorage.getItem('supabase_url')) {
+      SUPABASE_URL = localStorage.getItem('supabase_url');
+    }
+    if (localStorage.getItem('supabase_anon_key')) {
+      SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key');
+    }
+
+    let supabaseClient = null;
+    const isConfigured = !SUPABASE_URL.includes("YOUR_PROJECT") && !SUPABASE_ANON_KEY.includes("YOUR_ANON_KEY");
+
+    if (isConfigured) {
+      try {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        isMockMode = false;
+      } catch (err) {
+        console.error("Supabase client error, falling back to mock:", err);
+        isMockMode = true;
+      }
+    } else {
+      isMockMode = true;
+    }
+
+    // Initialize local lists from storage or mocks
+    if (isMockMode) {
+      if (!localStorage.getItem('mock_categories')) {
+        localStorage.setItem('mock_categories', JSON.stringify(MOCK_CATEGORIES));
+      }
+      if (!localStorage.getItem('mock_products')) {
+        localStorage.setItem('mock_products', JSON.stringify(MOCK_PRODUCTS));
+      }
+      if (!localStorage.getItem('mock_agencies')) {
+        localStorage.setItem('mock_agencies', JSON.stringify(MOCK_AGENCIES));
+      }
+      categoriesList = JSON.parse(localStorage.getItem('mock_categories'));
+      productsList = JSON.parse(localStorage.getItem('mock_products'));
+      agenciesList = JSON.parse(localStorage.getItem('mock_agencies'));
+    }
+
+    // ----------------------------------------------------
+    // AUTH LOGIC & SESSION FLOW
+    // ----------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      // Setup dynamic stock status checkbox labels
+      document.getElementById('prod-stock').addEventListener('change', function() {
+        const textSpan = document.getElementById('prod-stock-text');
+        if (this.checked) {
+          textSpan.textContent = "متوفر في المخزن ✓";
+          textSpan.style.color = "var(--success)";
+        } else {
+          textSpan.textContent = "نفد المخزون ✗";
+          textSpan.style.color = "var(--danger)";
+        }
+      });
+
+      // Session Verification
+      checkSession();
+    });
+
+    async function checkSession() {
+      // In Mock Mode, check simulated session
+      if (isMockMode) {
+        const isDemoLoggedIn = sessionStorage.getItem('demo_auth') === 'true';
+        updateUIForAuth(isDemoLoggedIn);
+        updateStatusCard("Demo / Offline Mode", "demo");
+        if (isDemoLoggedIn) {
+          loadData();
+        }
+        return;
+      }
+
+      // Live Supabase Mode session check
+      try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        const isLoggedIn = !!session;
+        updateUIForAuth(isLoggedIn);
+        updateStatusCard("متصل بقاعدة البيانات", "live");
+        
+        if (isLoggedIn) {
+          loadData();
+        }
+
+        // Listen for Auth changes
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+          const state = !!session;
+          updateUIForAuth(state);
+          if (state) {
+            loadData();
+          }
+        });
+      } catch (err) {
+        console.error("Auth session check failed:", err);
+        isMockMode = true;
+        checkSession();
+      }
+    }
+
+    function updateUIForAuth(isLoggedIn) {
+      const loginPanel = document.getElementById('login-panel');
+      const dashboardLayout = document.getElementById('dashboard-layout');
+
+      if (isLoggedIn) {
+        loginPanel.style.display = 'none';
+        dashboardLayout.style.display = 'flex';
+      } else {
+        loginPanel.style.display = 'flex';
+        dashboardLayout.style.display = 'none';
+        // Clear login form
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        document.getElementById('login-error-msg').style.display = 'none';
+      }
+    }
+
+    function updateStatusCard(text, mode) {
+      const card = document.getElementById('db-status-card');
+      const badge = document.getElementById('db-status-badge');
+      card.style.display = 'block';
+
+      if (mode === "demo") {
+        badge.innerHTML = `<span class="status-indicator demo"></span>وضع العرض التجريبي`;
+      } else {
+        badge.innerHTML = `<span class="status-indicator"></span>متصل بـ Supabase`;
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorMsg = document.getElementById('login-error-msg');
+      errorMsg.style.display = 'none';
+
+      if (isMockMode) {
+        if (email === 'admin@alfaisal.com' && password === 'admin123') {
+          sessionStorage.setItem('demo_auth', 'true');
+          updateUIForAuth(true);
+          loadData();
+        } else {
+          errorMsg.style.display = 'block';
+        }
+        return;
+      }
+
+      // Supabase Authentic Login
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        updateUIForAuth(true);
+      } catch (err) {
+        console.error("Login failed:", err);
+        errorMsg.textContent = err.message || "فشل تسجيل الدخول. يرجى التحقق من المدخلات.";
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    async function handleLogout() {
+      if (isMockMode) {
+        sessionStorage.removeItem('demo_auth');
+        updateUIForAuth(false);
+        return;
+      }
+
+      try {
+        await supabaseClient.auth.signOut();
+        updateUIForAuth(false);
+      } catch (err) {
+        console.error("Signout error:", err);
+        sessionStorage.removeItem('demo_auth');
+        updateUIForAuth(false);
+      }
+    }
+
+    // ----------------------------------------------------
+    // DATABASE LOADING
+    // ----------------------------------------------------
+    async function loadData() {
+      if (isMockMode) {
+        categoriesList = JSON.parse(localStorage.getItem('mock_categories')) || [];
+        productsList = JSON.parse(localStorage.getItem('mock_products')) || [];
+        agenciesList = JSON.parse(localStorage.getItem('mock_agencies')) || [];
+        renderAllTables();
+        populateCategoryDropdown();
+        return;
+      }
+
+      try {
+        // Fetch Categories
+        const { data: cats, error: catErr } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (catErr) throw catErr;
+        categoriesList = cats || [];
+
+        // Fetch Products
+        const { data: prods, error: prodErr } = await supabaseClient
+          .from('products')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (prodErr) throw prodErr;
+        productsList = prods || [];
+
+        // Fetch Agencies
+        const { data: ags, error: agErr } = await supabaseClient
+          .from('agencies')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (agErr) throw agErr;
+        agenciesList = ags || [];
+
+        renderAllTables();
+        populateCategoryDropdown();
+      } catch (err) {
+        console.error("Fetch tables failed, loading mock data:", err);
+        isMockMode = true;
+        updateStatusCard("Demo / Offline Mode", "demo");
+        loadData();
+      }
+    }
+
+    function renderAllTables() {
+      renderCategoriesTable();
+      renderProductsTable();
+      renderAgenciesTable();
+    }
+
+    // ----------------------------------------------------
+    // CRUD CATEGORIES
+    // ----------------------------------------------------
+    function renderCategoriesTable() {
+      const tbody = document.getElementById('categories-table-body');
+      let html = '';
+
+      categoriesList.forEach(cat => {
+        html += `
+          <tr>
+            <td>${cat.name_ar}</td>
+            <td>${cat.name_en}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-edit flex-center" onclick="editCategory('${cat.id}')">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-delete flex-center" onclick="deleteCategory('${cat.id}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html || '<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">لا توجد أقسام مضافة بعد</td></tr>';
+    }
+
+    function populateCategoryDropdown() {
+      const select = document.getElementById('prod-category');
+      let html = '<option value="" disabled selected>اختر قسم...</option>';
+      
+      categoriesList.forEach(cat => {
+        html += `<option value="${cat.id}">${cat.name_ar}</option>`;
+      });
+
+      select.innerHTML = html;
+    }
+
+    function editCategory(id) {
+      const cat = categoriesList.find(c => c.id === id);
+      if (!cat) return;
+
+      document.getElementById('cat-id').value = cat.id;
+      document.getElementById('cat-name-ar').value = cat.name_ar;
+      document.getElementById('cat-name-en').value = cat.name_en;
+      document.getElementById('category-form-title').textContent = "تعديل القسم";
+      document.getElementById('btn-save-category').textContent = "تحديث القسم";
+    }
+
+    function resetCategoryForm() {
+      document.getElementById('cat-id').value = '';
+      document.getElementById('category-form').reset();
+      document.getElementById('category-form-title').textContent = "إضافة قسم جديد";
+      document.getElementById('btn-save-category').textContent = "حفظ القسم";
+    }
+
+    async function saveCategory(e) {
+      e.preventDefault();
+      const id = document.getElementById('cat-id').value;
+      const name_ar = document.getElementById('cat-name-ar').value.trim();
+      const name_en = document.getElementById('cat-name-en').value.trim();
+
+      const btn = document.getElementById('btn-save-category');
+      const origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "جاري الحفظ...";
+
+      if (isMockMode) {
+        if (id) {
+          // Edit
+          const idx = categoriesList.findIndex(c => c.id === id);
+          if (idx > -1) {
+            categoriesList[idx].name_ar = name_ar;
+            categoriesList[idx].name_en = name_en;
+          }
+        } else {
+          // New
+          categoriesList.push({
+            id: "mock-cat-" + Date.now(),
+            name_ar,
+            name_en,
+            sort_order: categoriesList.length + 1
+          });
+        }
+        localStorage.setItem('mock_categories', JSON.stringify(categoriesList));
+        resetCategoryForm();
+        loadData();
+        btn.disabled = false;
+        btn.textContent = origText;
+        return;
+      }
+
+      // Live Supabase Saving
+      try {
+        if (id) {
+          // Update
+          const { error } = await supabaseClient
+            .from('categories')
+            .update({ name_ar, name_en })
+            .eq('id', id);
+          if (error) throw error;
+        } else {
+          // Insert
+          const { error } = await supabaseClient
+            .from('categories')
+            .insert([{ name_ar, name_en, sort_order: categoriesList.length + 1 }]);
+          if (error) throw error;
+        }
+        resetCategoryForm();
+        loadData();
+      } catch (err) {
+        console.error("Save category failed:", err);
+        alert("فشل حفظ القسم: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm("هل أنت متأكد من حذف هذا القسم؟ قد يؤثر ذلك على المنتجات المرتبطة به.")) return;
+
+      if (isMockMode) {
+        categoriesList = categoriesList.filter(c => c.id !== id);
+        localStorage.setItem('mock_categories', JSON.stringify(categoriesList));
+        // Remove category reference from mock products
+        productsList.forEach(prod => {
+          if (prod.category_id === id) {
+            prod.category_id = null;
+          }
+        });
+        localStorage.setItem('mock_products', JSON.stringify(productsList));
+        loadData();
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from('categories')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        loadData();
+      } catch (err) {
+        console.error("Delete category failed:", err);
+        alert("فشل حذف القسم: " + err.message);
+      }
+    }
+
+    // ----------------------------------------------------
+    // CRUD PRODUCTS
+    // ----------------------------------------------------
+    function renderProductsTable() {
+      const tbody = document.getElementById('products-table-body');
+      let html = '';
+
+      productsList.forEach(prod => {
+        const cat = categoriesList.find(c => c.id === prod.category_id);
+        const catName = cat ? cat.name_ar : '<span style="color: var(--text-muted);">بلا قسم</span>';
+        const imgHtml = prod.image_url 
+          ? `<img class="thumbnail" src="${prod.image_url}" alt="${prod.name_ar}">` 
+          : `<div class="thumbnail flex-center" style="background: var(--bg-light); color: var(--text-muted);"><i class="fa-solid fa-image"></i></div>`;
+        const stockHtml = prod.in_stock 
+          ? `<span class="badge-stock in">متوفر</span>` 
+          : `<span class="badge-stock out">نفد</span>`;
+
+        html += `
+          <tr>
+            <td>${imgHtml}</td>
+            <td style="font-weight: 700;">${prod.name_ar}</td>
+            <td>${catName}</td>
+            <td>${formatPrice(prod.price)} د.ع</td>
+            <td>${stockHtml}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-edit flex-center" onclick="editProduct('${prod.id}')">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-delete flex-center" onclick="deleteProduct('${prod.id}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html || '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">لا توجد منتجات مضافة بعد</td></tr>';
+    }
+
+    function previewProductImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      selectedImageFile = file;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedProductImageBase64 = e.target.result;
+        
+        const preview = document.getElementById('prod-img-preview');
+        const placeholder = document.getElementById('prod-img-placeholder');
+        
+        preview.src = uploadedProductImageBase64;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function editProduct(id) {
+      const prod = productsList.find(p => p.id === id);
+      if (!prod) return;
+
+      document.getElementById('prod-id').value = prod.id;
+      document.getElementById('prod-name-ar').value = prod.name_ar;
+      document.getElementById('prod-name-en').value = prod.name_en;
+      document.getElementById('prod-desc-ar').value = prod.description_ar || '';
+      document.getElementById('prod-desc-en').value = prod.description_en || '';
+      document.getElementById('prod-price').value = prod.price;
+      document.getElementById('prod-category').value = prod.category_id || '';
+      document.getElementById('prod-stock').checked = prod.in_stock;
+
+      // Update stock toggle label styling
+      const textSpan = document.getElementById('prod-stock-text');
+      if (prod.in_stock) {
+        textSpan.textContent = "متوفر في المخزن ✓";
+        textSpan.style.color = "var(--success)";
+      } else {
+        textSpan.textContent = "نفد المخزون ✗";
+        textSpan.style.color = "var(--danger)";
+      }
+
+      const preview = document.getElementById('prod-img-preview');
+      const placeholder = document.getElementById('prod-img-placeholder');
+
+      if (prod.image_url) {
+        preview.src = prod.image_url;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+        uploadedProductImageBase64 = prod.image_url;
+      } else {
+        preview.style.display = 'none';
+        placeholder.style.display = 'flex';
+        uploadedProductImageBase64 = "";
+      }
+
+      document.getElementById('product-form-title').textContent = "تعديل بيانات المنتج";
+      document.getElementById('btn-save-product').textContent = "تحديث المنتج";
+    }
+
+    function resetProductForm() {
+      document.getElementById('prod-id').value = '';
+      document.getElementById('product-form').reset();
+      document.getElementById('prod-img-preview').style.display = 'none';
+      document.getElementById('prod-img-placeholder').style.display = 'flex';
+      
+      const stockText = document.getElementById('prod-stock-text');
+      stockText.textContent = "متوفر في المخزن ✓";
+      stockText.style.color = "";
+      
+      uploadedProductImageBase64 = "";
+      selectedImageFile = null;
+
+      document.getElementById('product-form-title').textContent = "إضافة منتج جديد";
+      document.getElementById('btn-save-product').textContent = "حفظ المنتج";
+    }
+
+    async function saveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value;
+      const name_ar = document.getElementById('prod-name-ar').value.trim();
+      const name_en = document.getElementById('prod-name-en').value.trim();
+      const description_ar = document.getElementById('prod-desc-ar').value.trim();
+      const description_en = document.getElementById('prod-desc-en').value.trim();
+      const price = parseInt(document.getElementById('prod-price').value);
+      const category_id = document.getElementById('prod-category').value;
+      const in_stock = document.getElementById('prod-stock').checked;
+
+      const btn = document.getElementById('btn-save-product');
+      const origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "جاري الحفظ والرفع...";
+
+      let image_url = uploadedProductImageBase64 || "";
+
+      if (isMockMode) {
+        if (id) {
+          // Update
+          const idx = productsList.findIndex(p => p.id === id);
+          if (idx > -1) {
+            productsList[idx] = {
+              ...productsList[idx],
+              name_ar, name_en, description_ar, description_en, price, category_id, in_stock, image_url
+            };
+          }
+        } else {
+          // Insert
+          productsList.push({
+            id: "mock-p-" + Date.now(),
+            name_ar, name_en, description_ar, description_en, price, category_id, in_stock, image_url,
+            sort_order: productsList.length + 1
+          });
+        }
+        localStorage.setItem('mock_products', JSON.stringify(productsList));
+        resetProductForm();
+        loadData();
+        btn.disabled = false;
+        btn.textContent = origText;
+        return;
+      }
+
+      // Live Supabase Storage Image Upload
+      try {
+        if (selectedImageFile) {
+          const fileExt = selectedImageFile.name.split('.').pop();
+          const fileName = `${Date.now()}_prod.${fileExt}`;
+          const filePath = `${fileName}`;
+
+          const { error: uploadError } = await supabaseClient.storage
+            .from('product-images')
+            .upload(filePath, selectedImageFile);
+
+          if (uploadError) throw uploadError;
+
+          // Get public URL
+          const { data: urlData } = supabaseClient.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+          image_url = urlData.publicUrl;
+        }
+
+        const productData = {
+          name_ar, name_en, description_ar, description_en, price, category_id, in_stock, image_url
+        };
+
+        if (id) {
+          // Update
+          const { error } = await supabaseClient
+            .from('products')
+            .update(productData)
+            .eq('id', id);
+          if (error) throw error;
+        } else {
+          // Insert
+          const { error } = await supabaseClient
+            .from('products')
+            .insert([{ ...productData, sort_order: productsList.length + 1 }]);
+          if (error) throw error;
+        }
+
+        resetProductForm();
+        loadData();
+      } catch (err) {
+        console.error("Save product failed:", err);
+        alert("فشل حفظ المنتج: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("هل أنت متأكد من رغبتك بحذف هذا المنتج؟")) return;
+
+      if (isMockMode) {
+        productsList = productsList.filter(p => p.id !== id);
+        localStorage.setItem('mock_products', JSON.stringify(productsList));
+        loadData();
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from('products')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        loadData();
+      } catch (err) {
+        console.error("Delete product failed:", err);
+        alert("فشل حذف المنتج: " + err.message);
+      }
+    }
+
+    // ----------------------------------------------------
+    // CRUD AGENCIES
+    // ----------------------------------------------------
+    function renderAgenciesTable() {
+      const tbody = document.getElementById('agencies-table-body');
+      let html = '';
+
+      agenciesList.forEach(ag => {
+        html += `
+          <tr>
+            <td style="font-weight: 700;">${ag.name}</td>
+            <td>${ag.is_exclusive ? '<span style="color:var(--success);">نعم</span>' : '<span style="color:var(--text-muted);">لا</span>'}</td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-edit flex-center" onclick="editAgency('${ag.id}')">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-delete flex-center" onclick="deleteAgency('${ag.id}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html || '<tr><td colspan="3" style="text-align: center; color: var(--text-muted);">لا توجد وكالات مضافة بعد</td></tr>';
+    }
+
+    function editAgency(id) {
+      const ag = agenciesList.find(a => a.id === id);
+      if (!ag) return;
+
+      document.getElementById('ag-id').value = ag.id;
+      document.getElementById('ag-name').value = ag.name;
+      document.getElementById('ag-desc-ar').value = ag.description_ar || '';
+      document.getElementById('ag-desc-en').value = ag.description_en || '';
+      document.getElementById('ag-logo').value = ag.logo_url || '';
+      document.getElementById('ag-exclusive').checked = ag.is_exclusive;
+
+      document.getElementById('agency-form-title').textContent = "تعديل الوكالة";
+      document.getElementById('btn-save-agency').textContent = "تحديث الوكالة";
+    }
+
+    function resetAgencyForm() {
+      document.getElementById('ag-id').value = '';
+      document.getElementById('agency-form').reset();
+      document.getElementById('agency-form-title').textContent = "إضافة وكالة جديدة";
+      document.getElementById('btn-save-agency').textContent = "حفظ الوكالة";
+    }
+
+    async function saveAgency(e) {
+      e.preventDefault();
+      const id = document.getElementById('ag-id').value;
+      const name = document.getElementById('ag-name').value.trim();
+      const description_ar = document.getElementById('ag-desc-ar').value.trim();
+      const description_en = document.getElementById('ag-desc-en').value.trim();
+      const logo_url = document.getElementById('ag-logo').value.trim();
+      const is_exclusive = document.getElementById('ag-exclusive').checked;
+
+      const btn = document.getElementById('btn-save-agency');
+      const origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "جاري الحفظ...";
+
+      const agencyData = { name, description_ar, description_en, logo_url, is_exclusive };
+
+      if (isMockMode) {
+        if (id) {
+          const idx = agenciesList.findIndex(a => a.id === id);
+          if (idx > -1) {
+            agenciesList[idx] = { ...agenciesList[idx], ...agencyData };
+          }
+        } else {
+          agenciesList.push({
+            id: "mock-ag-" + Date.now(),
+            ...agencyData,
+            sort_order: agenciesList.length + 1
+          });
+        }
+        localStorage.setItem('mock_agencies', JSON.stringify(agenciesList));
+        resetAgencyForm();
+        loadData();
+        btn.disabled = false;
+        btn.textContent = origText;
+        return;
+      }
+
+      try {
+        if (id) {
+          const { error } = await supabaseClient.from('agencies').update(agencyData).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabaseClient.from('agencies').insert([{ ...agencyData, sort_order: agenciesList.length + 1 }]);
+          if (error) throw error;
+        }
+        resetAgencyForm();
+        loadData();
+      } catch (err) {
+        console.error("Save agency failed:", err);
+        alert("فشل حفظ الوكالة: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
+    }
+
+    async function deleteAgency(id) {
+      if (!confirm("هل أنت متأكد من حذف هذه الوكالة؟")) return;
+
+      if (isMockMode) {
+        agenciesList = agenciesList.filter(a => a.id !== id);
+        localStorage.setItem('mock_agencies', JSON.stringify(agenciesList));
+        loadData();
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient.from('agencies').delete().eq('id', id);
+        if (error) throw error;
+        loadData();
+      } catch (err) {
+        console.error("Delete agency failed:", err);
+        alert("فشل حذف الوكالة: " + err.message);
+      }
+    }
+
+    // ----------------------------------------------------
+    // AUTOMATIC TRANSLATION
+    // ----------------------------------------------------
+    async function translateField(sourceId, targetId, btnEl) {
+      const sourceVal = document.getElementById(sourceId).value.trim();
+      if (!sourceVal) return;
+
+      const origHtml = btnEl.innerHTML;
+      btnEl.disabled = true;
+      btnEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+      try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceVal)}&langpair=ar|en`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data && data.responseData && data.responseData.translatedText) {
+          document.getElementById(targetId).value = data.responseData.translatedText;
+        } else {
+          alert("فشلت الترجمة التلقائية. يرجى إدخال النص يدوياً.");
+        }
+      } catch (err) {
+        console.error("Translation error:", err);
+        alert("حدث خطأ أثناء الاتصال بخدمة الترجمة.");
+      } finally {
+        btnEl.disabled = false;
+        btnEl.innerHTML = origHtml;
+      }
+    }
+
+    // ----------------------------------------------------
+    // TAB SWITCHING
+    // ----------------------------------------------------
+    function switchTab(tab) {
+      // Deactivate all
+      document.querySelectorAll('.dashboard-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => m.classList.remove('active'));
+
+      // Activate selected
+      if (tab === 'products') {
+        document.getElementById('panel-products').classList.add('active');
+        document.getElementById('tab-products-btn').classList.add('active');
+        document.getElementById('current-tab-title').textContent = "إدارة المنتجات";
+      } else if (tab === 'categories') {
+        document.getElementById('panel-categories').classList.add('active');
+        document.getElementById('tab-categories-btn').classList.add('active');
+        document.getElementById('current-tab-title').textContent = "إدارة الأقسام";
+      } else if (tab === 'agencies') {
+        document.getElementById('panel-agencies').classList.add('active');
+        document.getElementById('tab-agencies-btn').classList.add('active');
+        document.getElementById('current-tab-title').textContent = "إدارة الوكالات";
+      }
+    }
+
+    // ----------------------------------------------------
+    // SETTINGS MODAL & OVERRIDES
+    // ----------------------------------------------------
+    function openSettingsModal() {
+      document.getElementById('set-url').value = SUPABASE_URL.includes("YOUR_PROJECT") ? "" : SUPABASE_URL;
+      document.getElementById('set-key').value = SUPABASE_ANON_KEY.includes("YOUR_ANON_KEY") ? "" : SUPABASE_ANON_KEY;
+      document.getElementById('settings-modal').style.display = 'flex';
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').style.display = 'none';
+    }
+
+    function saveSettings() {
+      const url = document.getElementById('set-url').value.trim();
+      const key = document.getElementById('set-key').value.trim();
+
+      if (url === "" || key === "") {
+        alert("Please fill in both fields.");
+        return;
+      }
+
+      localStorage.setItem('supabase_url', url);
+      localStorage.setItem('supabase_anon_key', key);
+      
+      window.location.reload();
+    }
+
+    // Helper formatter
+    function formatPrice(val) {
+      return Number(val).toLocaleString(undefined);
+    }
+  </script>
+</body>
+</html>

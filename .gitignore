@@ -1,0 +1,15 @@
+# Environment variables - DO NOT COMMIT
+.env
+.env.local
+.env.production
+
+# Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node (if needed in future)
+node_modules/
