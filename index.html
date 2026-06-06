@@ -1555,10 +1555,7 @@
       isMockMode = true;
     }
 
-    // Show warning banner if running in Mock Mode
-    if (isMockMode) {
-      document.getElementById('config-warning').style.display = 'block';
-    }
+
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
@@ -1582,13 +1579,13 @@
       // Update UI components
       updateCartBadge();
       
-      // Hide Splash screen after 3 seconds
+      // Hide Splash screen after 2 seconds
       setTimeout(() => {
         const intro = document.getElementById('intro-screen');
         if (intro) {
           intro.classList.add('fade-out');
         }
-      }, 3000);
+      }, 2000);
     });
 
     // ----------------------------------------------------

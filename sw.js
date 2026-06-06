@@ -1,4 +1,4 @@
-const CACHE_NAME = 'alfaisal-cache-v1';
+const CACHE_NAME = 'alfaisal-cache-v2';
 const ASSETS = [
   './',
   './index.html',
